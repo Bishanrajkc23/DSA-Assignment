@@ -15,59 +15,42 @@
 import java.util.Arrays;
 import java.util.Comparator;
 
+
+import java.util.ArrayList;
+
 public class Q5_b {
+    public int numBatteryReplacements(int[][] serviceCenters, int targetMiles, int startChargeCapacity) {
+        //count is an integer variable initialized to 0.
+        int count = 0;
+        int cMiles = startChargeCapacity;
+        ArrayList<Integer> distances = new ArrayList<>();
+        ArrayList<Integer> capacities = new ArrayList<>();
 
-    public static void main(String[] args) {
-        int[][] serviceCenters = {{10,60},{20,30},{30,30},{60,40}};
-        int targetMiles = 100;
-        int startChargeCapacity = 10;
-        int numBatteryReplacements = batteryReplacements(serviceCenters, targetMiles, startChargeCapacity);
-        System.out.println(numBatteryReplacements);
-    }
+        for (int[] serviceCenter : serviceCenters) {
+            distances.add(serviceCenter[0]);
+            capacities.add(serviceCenter[1]);
+        }
 
-    public static int batteryReplacements(int[][] serviceCenters, int targetMiles, int startChargeCapacity) {
-        int numBatteryReplacements = 0;
-        int currentMiles = 0;
-        int currentChargeCapacity = startChargeCapacity;
-
-        // By sorting from the originating city, order the service centers
-        Arrays.sort(serviceCenters, Comparator.comparingInt(sc -> sc[0]));
-
-        for (int i = 0; i < serviceCenters.length; i++) {
-            int[] currentCenter = serviceCenters[i];
-            int distanceToNextCenter = i == serviceCenters.length - 1 ? targetMiles - currentMiles : serviceCenters[i+1][0] - currentCenter[0];
-
-            // Determine how many battery replacements are necessary to go to the next service location.
-            int batteryReplacementsNeeded = (int) Math.ceil((double) distanceToNextCenter / currentChargeCapacity) - 1;
-
-            // If we are unable to reach the next center, we must pause and rest.
-            if (batteryReplacementsNeeded > 0 && currentChargeCapacity * batteryReplacementsNeeded < distanceToNextCenter) {
-                numBatteryReplacements += batteryReplacementsNeeded;
-                currentChargeCapacity = currentCenter[1];
-            }
-
-            // Update our current charge capacity and mileage
-            currentMiles += distanceToNextCenter;
-            currentChargeCapacity -= distanceToNextCenter;
-            if (currentChargeCapacity <= 0) {
-                numBatteryReplacements++;
-                currentChargeCapacity = currentCenter[1] - (distanceToNextCenter - startChargeCapacity);
-            }
-
-            // If we have covered the desired distances, we are finished.
-            if (currentMiles == targetMiles) {
-                return numBatteryReplacements;
+        for (int i = 0; i < distances.size(); i++) {
+            if (distances.get(i) > cMiles) {
+                cMiles = capacities.get(i - 1);
+                count++;
             }
         }
 
-        // If the goal miles weren't reached, we must continue till they are.
-        int distanceToTarget = targetMiles - currentMiles;
-        int batteryReplacementsNeeded = (int) Math.ceil((double) distanceToTarget / currentChargeCapacity) - 1;
-        numBatteryReplacements += batteryReplacementsNeeded;
+        if (cMiles < targetMiles) {
+            count++;
+        }
 
-        return numBatteryReplacements;
+        return count;
     }
 
 
+    public static void main(String[] args) {
+        int [][] serviceCenterList={{10,60},{20,30},{30,30},{60,40}};
+        Q5_b question1=new Q5_b();
+        int fAnswer=question1.numBatteryReplacements(serviceCenterList,100,10);
+        System.out.println("The vehicle's batteries require replacement: "+ fAnswer +"times.");
 
+    }
 }
